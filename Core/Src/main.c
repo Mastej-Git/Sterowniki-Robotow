@@ -77,6 +77,16 @@ struct Rect {
 void draw_rect(struct Rect rect) {
 	ILI9341_Draw_Rectangle(rect.x, rect.y, rect.width, rect.height, rect.color);
 }
+
+struct Field {
+	struct Rect border;
+	struct Rect fill;
+};
+
+void draw_field(struct Field field) {
+	ILI9341_Draw_Rectangle(field.border.x, field.border.y, field.border.width, field.border.height, field.border.color);
+	ILI9341_Draw_Rectangle(field.fill.x, field.fill.y, field.fill.width, field.fill.height, field.fill.color);
+}
 /* USER CODE END 0 */
 
 /**
@@ -138,6 +148,7 @@ int main(void)
   uint8_t exists = 0;
 
   struct Rect player = {0, 0, 30, 30, GREEN};
+  struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
   while (1)
   {
@@ -147,8 +158,11 @@ int main(void)
 	  draw_rect(player);
 
 	  if (exists == 0) {
-		  ILI9341_Draw_Rectangle(rand_x, rand_y, 30, 30, RED);
-		  ILI9341_Draw_Rectangle(rand_x + 3, rand_y + 3, 24, 24, WHITE);
+		  field.border.x = rand_x;
+		  field.border.y = rand_y;
+		  field.fill.x = rand_x + 3;
+		  field.fill.y = rand_y + 3;
+		  draw_field(field);
 		  exists = 1;
 	  }
 
