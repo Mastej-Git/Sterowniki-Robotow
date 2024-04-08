@@ -34,6 +34,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "ILI9341_STM32_Driver.h"
+#include <time.h>
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,7 +66,17 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+struct Rect {
+	int x;
+	int y;
+	int width;
+	int height;
+	int color;
+};
 
+void draw_rect(struct Rect rect) {
+	ILI9341_Draw_Rectangle(rect.x, rect.y, rect.width, rect.height, rect.color);
+}
 /* USER CODE END 0 */
 
 /**
@@ -117,22 +129,42 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   ILI9341_Init();
   ILI9341_Fill_Screen(WHITE);
-//  ILI9341_Fill_Screen(GREEN);
-  int x = 120;
-  int y = 160;
+
+  srand(time(NULL));
+
+//  int x = 120;
+//  int y = 160;
+
+  uint8_t exists = 0;
+
+  struct Rect player = {0, 0, 30, 30, GREEN};
+
   while (1)
   {
-	  ILI9341_Draw_Rectangle(x, y, 30, 30, GREEN);
+	  int rand_x = rand() % 210;
+	  int rand_y = rand() % 280;
+
+	  draw_rect(player);
+
+	  if (exists == 0) {
+		  ILI9341_Draw_Rectangle(rand_x, rand_y, 30, 30, RED);
+		  ILI9341_Draw_Rectangle(rand_x + 3, rand_y + 3, 24, 24, WHITE);
+		  exists = 1;
+	  }
+
 	  HAL_Delay(5);
-	  ILI9341_Draw_Rectangle(x, y, 30, 30, WHITE);
+	  player.color = WHITE;
+	  draw_rect(player);
+	  player.color = GREEN;
 //	  HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 //	  HAL_Delay(500);
 	 // ILI9341_Fill_Screen(WHITE);
-	  x++;
-	  y++;
-	  if (x >= 320 || y >= 240) {
-		  x = 0;
-		  y = 0;
+	  player.x++;
+	  player.y++;
+	  if (player.x >= 320 || player.y >= 240) {
+		  player.x = 0;
+		  player.y = 0;
+		  exists = 0;
 	  }
     /* USER CODE END WHILE */
 
