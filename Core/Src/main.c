@@ -97,6 +97,64 @@ int is_collision(struct Rect rect1, struct Rect rect2) {
 	}
 	return 0;
 }
+
+struct Circle {
+	int x;
+	int y;
+	int radius;
+	int color;
+};
+
+void draw_circle(struct Circle circle) {
+	ILI9341_Draw_Horizontal_Line(circle.x + 11, circle.y, 8, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 8, circle.y + 1, 14, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 7, circle.y + 2, 16, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 5, circle.y + 3, 20, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 4, circle.y + 4, 22, circle.color);
+
+	ILI9341_Draw_Horizontal_Line(circle.x + 3, circle.y + 5, 24, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 3, circle.y + 6, 24, circle.color);
+
+	ILI9341_Draw_Horizontal_Line(circle.x + 2, circle.y + 7, 26, circle.color);
+
+	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 8, 28, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 9, 28, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 10, 28, circle.color);
+
+	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 11, 30, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 12, 30, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 13, 30, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 14, 30, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 15, 30, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 16, 30, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 17, 30, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 18, 30, circle.color);
+
+	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 19, 28, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 20, 28, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 21, 28, circle.color);
+
+	ILI9341_Draw_Horizontal_Line(circle.x + 2, circle.y + 22, 26, circle.color);
+
+	ILI9341_Draw_Horizontal_Line(circle.x + 3, circle.y + 23, 24, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 3, circle.y + 24, 24, circle.color);
+
+	ILI9341_Draw_Horizontal_Line(circle.x + 4, circle.y + 25, 22, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 5, circle.y + 26, 20, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 7, circle.y + 27, 16, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 8, circle.y + 28, 14, circle.color);
+	ILI9341_Draw_Horizontal_Line(circle.x + 11, circle.y + 29, 8, circle.color);
+}
+
+int is_collision_1(struct Circle circle, struct Rect rect) {
+	if (circle.x + circle.radius * 2 >= rect.x &&
+		circle.x <= rect.x + rect.width &&
+		circle.y + circle.radius * 2 >= rect.y &&
+		circle.y <= rect.y + rect.height) {
+		return 1;
+	}
+	return 0;
+}
 /* USER CODE END 0 */
 
 /**
@@ -152,13 +210,11 @@ int main(void)
 
   srand(time(NULL));
 
-//  int x = 120;
-//  int y = 160;
-
   uint8_t exists = 0;
   int collision = 0;
 
   struct Rect player = {0, 0, 30, 30, GREEN};
+  struct Circle player1 = {0, 0, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
   while (1)
@@ -175,9 +231,18 @@ int main(void)
 		  exists = 1;
 	  }
 
-	  draw_rect(player);
+//	  draw_rect(player);
+	  draw_circle(player1);
 
-	  collision = is_collision(player, field.border);
+//	  collision = is_collision(player, field.border);
+	  collision = is_collision_1(player1, field.border);
+
+//	  if (collision == 1) {
+//		  field.border.color = WHITE;
+//		  draw_field(field);
+//		  field.border.color = RED;
+//		  exists = 0;
+//	  }
 
 	  if (collision == 1) {
 		  field.border.color = WHITE;
@@ -186,16 +251,18 @@ int main(void)
 		  exists = 0;
 	  }
 
-	  HAL_Delay(5);
-	  player.color = WHITE;
-	  draw_rect(player);
-	  player.color = GREEN;
+	  HAL_Delay(10);
+	  player1.color = WHITE;
+//	  draw_rect(player);
+	  draw_circle(player1);
+	  player1.color = GREEN;
 
-	  player.x++;
-	  player.y++;
-	  if (player.x >= 320 || player.y >= 240) {
-		  player.x = 0;
-		  player.y = 0;
+	  player1.x++;
+	  player1.y++;
+	  if (player1.x + player1.radius * 2 >= 320 || player1.y + player1.radius * 2 >= 240) {
+		  player1.x = 0;
+		  player1.y = 0;
+		  exists = 0;
 	  }
     /* USER CODE END WHILE */
 
