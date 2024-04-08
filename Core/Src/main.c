@@ -87,6 +87,16 @@ void draw_field(struct Field field) {
 	ILI9341_Draw_Rectangle(field.border.x, field.border.y, field.border.width, field.border.height, field.border.color);
 	ILI9341_Draw_Rectangle(field.fill.x, field.fill.y, field.fill.width, field.fill.height, field.fill.color);
 }
+
+int is_collision(struct Rect rect1, struct Rect rect2) {
+	if (rect1.x + rect1.width >= rect2.x &&
+		rect1.x <= rect2.x + rect2.width &&
+		rect1.y + rect1.height >= rect2.y &&
+		rect1.y <= rect2.y + rect2.height) {
+		return 1;
+	}
+	return 0;
+}
 /* USER CODE END 0 */
 
 /**
@@ -146,6 +156,7 @@ int main(void)
 //  int y = 160;
 
   uint8_t exists = 0;
+  int collision = 0;
 
   struct Rect player = {0, 0, 30, 30, GREEN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
@@ -154,8 +165,6 @@ int main(void)
   {
 	  int rand_x = rand() % 210;
 	  int rand_y = rand() % 280;
-
-	  draw_rect(player);
 
 	  if (exists == 0) {
 		  field.border.x = rand_x;
@@ -166,19 +175,27 @@ int main(void)
 		  exists = 1;
 	  }
 
+	  draw_rect(player);
+
+	  collision = is_collision(player, field.border);
+
+	  if (collision == 1) {
+		  field.border.color = WHITE;
+		  draw_field(field);
+		  field.border.color = RED;
+		  exists = 0;
+	  }
+
 	  HAL_Delay(5);
 	  player.color = WHITE;
 	  draw_rect(player);
 	  player.color = GREEN;
-//	  HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-//	  HAL_Delay(500);
-	 // ILI9341_Fill_Screen(WHITE);
+
 	  player.x++;
 	  player.y++;
 	  if (player.x >= 320 || player.y >= 240) {
 		  player.x = 0;
 		  player.y = 0;
-		  exists = 0;
 	  }
     /* USER CODE END WHILE */
 
