@@ -36,6 +36,9 @@
 #include "ILI9341_STM32_Driver.h"
 #include <time.h>
 #include <stdlib.h>
+#include "rect.h"
+#include "field.h"
+#include "circle.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -66,27 +69,6 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-struct Rect {
-	int x;
-	int y;
-	int width;
-	int height;
-	int color;
-};
-
-void draw_rect(struct Rect rect) {
-	ILI9341_Draw_Rectangle(rect.x, rect.y, rect.width, rect.height, rect.color);
-}
-
-struct Field {
-	struct Rect border;
-	struct Rect fill;
-};
-
-void draw_field(struct Field field) {
-	ILI9341_Draw_Rectangle(field.border.x, field.border.y, field.border.width, field.border.height, field.border.color);
-	ILI9341_Draw_Rectangle(field.fill.x, field.fill.y, field.fill.width, field.fill.height, field.fill.color);
-}
 
 int is_collision(struct Rect rect1, struct Rect rect2) {
 	if (rect1.x + rect1.width >= rect2.x &&
@@ -96,54 +78,6 @@ int is_collision(struct Rect rect1, struct Rect rect2) {
 		return 1;
 	}
 	return 0;
-}
-
-struct Circle {
-	int x;
-	int y;
-	int radius;
-	int color;
-};
-
-void draw_circle(struct Circle circle) {
-	ILI9341_Draw_Horizontal_Line(circle.x + 11, circle.y, 8, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 8, circle.y + 1, 14, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 7, circle.y + 2, 16, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 5, circle.y + 3, 20, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 4, circle.y + 4, 22, circle.color);
-
-	ILI9341_Draw_Horizontal_Line(circle.x + 3, circle.y + 5, 24, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 3, circle.y + 6, 24, circle.color);
-
-	ILI9341_Draw_Horizontal_Line(circle.x + 2, circle.y + 7, 26, circle.color);
-
-	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 8, 28, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 9, 28, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 10, 28, circle.color);
-
-	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 11, 30, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 12, 30, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 13, 30, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 14, 30, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 15, 30, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 16, 30, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 17, 30, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x, circle.y + 18, 30, circle.color);
-
-	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 19, 28, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 20, 28, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 1, circle.y + 21, 28, circle.color);
-
-	ILI9341_Draw_Horizontal_Line(circle.x + 2, circle.y + 22, 26, circle.color);
-
-	ILI9341_Draw_Horizontal_Line(circle.x + 3, circle.y + 23, 24, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 3, circle.y + 24, 24, circle.color);
-
-	ILI9341_Draw_Horizontal_Line(circle.x + 4, circle.y + 25, 22, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 5, circle.y + 26, 20, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 7, circle.y + 27, 16, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 8, circle.y + 28, 14, circle.color);
-	ILI9341_Draw_Horizontal_Line(circle.x + 11, circle.y + 29, 8, circle.color);
 }
 
 int is_collision_1(struct Circle circle, struct Rect rect) {
@@ -213,7 +147,7 @@ int main(void)
   uint8_t exists = 0;
   int collision = 0;
 
-  struct Rect player = {0, 0, 30, 30, GREEN};
+//  struct Rect player = {0, 0, 30, 30, GREEN};
   struct Circle player1 = {0, 0, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
