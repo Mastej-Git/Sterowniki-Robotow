@@ -43,6 +43,44 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+#include "008_Open_Sans_Bold.h"
+#include "009_Open_Sans_Bold.h"
+#include "010_Open_Sans_Bold.h"
+#include "012_Open_Sans_Bold.h"
+#include "014_Open_Sans_Bold.h"
+#include "016_Open_Sans_Bold.h"
+#include "018_Open_Sans_Bold.h"
+#include "020_Open_Sans_Bold.h"
+#include "022_Open_Sans_Bold.h"
+#include "024_Open_Sans_Bold.h"
+#include "026_Open_Sans_Bold.h"
+#include "028_Open_Sans_Bold.h"
+#include "036_Open_Sans_Bold.h"
+#include "048_Open_Sans_Bold.h"
+#include "072_Open_Sans_Bold.h"
+#include "096_Open_Sans_Bold.h"
+#include "112_Open_Sans_Bold.h"
+#include "128_Open_Sans_Bold.h"
+
+#define _Open_Sans_Bold_8      &Open_Sans_Bold_8
+#define _Open_Sans_Bold_9      &Open_Sans_Bold_9
+#define _Open_Sans_Bold_10     &Open_Sans_Bold_10
+#define _Open_Sans_Bold_11     &Open_Sans_Bold_11
+#define _Open_Sans_Bold_12      &Open_Sans_Bold_12
+#define _Open_Sans_Bold_14      &Open_Sans_Bold_14
+#define _Open_Sans_Bold_16      &Open_Sans_Bold_16
+#define _Open_Sans_Bold_18      &Open_Sans_Bold_18
+#define _Open_Sans_Bold_20      &Open_Sans_Bold_20
+#define _Open_Sans_Bold_22      &Open_Sans_Bold_22
+#define _Open_Sans_Bold_24      &Open_Sans_Bold_24
+#define _Open_Sans_Bold_26      &Open_Sans_Bold_26
+#define _Open_Sans_Bold_28      &Open_Sans_Bold_28
+#define _Open_Sans_Bold_36      &Open_Sans_Bold_36
+#define _Open_Sans_Bold_48      &Open_Sans_Bold_48
+#define _Open_Sans_Bold_72      &Open_Sans_Bold_72
+#define _Open_Sans_Bold_96      &Open_Sans_Bold_96
+#define _Open_Sans_Bold_112      &Open_Sans_Bold_112
+#define _Open_Sans_Bold_128      &Open_Sans_Bold_128
 
 /* USER CODE END PTD */
 
@@ -134,7 +172,7 @@ int main(void)
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
   /* Start scheduler */
-//  osKernelStart();
+  //osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
@@ -146,8 +184,11 @@ int main(void)
 
   uint8_t exists = 0;
   int collision = 0;
+  char str[5];
+  int points = 0;
 
 //  struct Rect player = {0, 0, 30, 30, GREEN};
+  struct Rect filler = {0, 0, 20, 20, WHITE};
   struct Circle player1 = {0, 0, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
@@ -183,6 +224,7 @@ int main(void)
 		  draw_field(field);
 		  field.border.color = RED;
 		  exists = 0;
+		  points++;
 	  }
 
 	  HAL_Delay(10);
@@ -198,6 +240,14 @@ int main(void)
 		  player1.y = 0;
 		  exists = 0;
 	  }
+//	  ILI9341_Draw_Horizontal_Line(3, 3, 10, NAVY);
+//	  ILI9341_Draw_Vertical_Line(2, 4, 20, NAVY);
+//	  ILI9341_Draw_Vertical_Line(13, 4, 20, NAVY);
+//	  ILI9341_Draw_Horizontal_Line(3, 24, 10, NAVY);
+	  itoa(points, str, 10);
+
+	  draw_rect(filler);
+	  LCD_Font(3, 20, str, _Open_Sans_Bold_16, 1, 0x0000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

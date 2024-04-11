@@ -134,6 +134,27 @@
 #define SCREEN_VERTICAL_2			2
 #define SCREEN_HORIZONTAL_2		3
 
+#define _swap_int16_t(a, b) \
+	{int16_t t = a; \
+	a = b;   \
+	b = t; \
+  }
+
+
+typedef struct { // Data stored PER GLYPH
+	uint16_t bitmapOffset;     // Pointer into GFXfont->bitmap
+	uint8_t  width, height;    // Bitmap dimensions in pixels
+	uint8_t  xAdvance;         // Distance to advance cursor (x axis)
+	int8_t   xOffset, yOffset; // Dist from cursor position to UL corner
+} GFXglyph;
+
+typedef struct { // Data stored for FONT AS A WHOLE:
+	uint8_t  *bitmap;      // Glyph bitmaps, concatenated
+	GFXglyph *glyph;       // Glyph array
+	uint8_t   first, last; // ASCII extents
+	uint8_t   yAdvance;    // Newline distance (y axis)
+} GFXfont;
+
 void ILI9341_SPI_Init(void);
 void ILI9341_SPI_Send(unsigned char SPI_Data);
 void ILI9341_Write_Command(uint8_t Command);
@@ -152,6 +173,9 @@ void ILI9341_Draw_Colour_Burst(uint16_t Colour, uint32_t Size);
 void ILI9341_Draw_Rectangle(uint16_t X, uint16_t Y, uint16_t Width, uint16_t Height, uint16_t Colour);
 void ILI9341_Draw_Horizontal_Line(uint16_t X, uint16_t Y, uint16_t Width, uint16_t Colour);
 void ILI9341_Draw_Vertical_Line(uint16_t X, uint16_t Y, uint16_t Height, uint16_t Colour);
+
+void LCD_Char(int16_t x, int16_t y, const GFXglyph *glyph, const GFXfont *font, uint8_t size, uint32_t color24);
+void LCD_Font(uint16_t x, uint16_t y, const char *text, const GFXfont *p_font, uint8_t size, uint32_t color24);
 	
 #endif
 
