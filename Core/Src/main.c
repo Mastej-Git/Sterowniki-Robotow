@@ -39,6 +39,8 @@
 #include "rect.h"
 #include "field.h"
 #include "circle.h"
+#include "l3gd20.h"
+#include "i3g4250d.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -108,17 +110,7 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int is_collision(struct Rect rect1, struct Rect rect2) {
-	if (rect1.x + rect1.width >= rect2.x &&
-		rect1.x <= rect2.x + rect2.width &&
-		rect1.y + rect1.height >= rect2.y &&
-		rect1.y <= rect2.y + rect2.height) {
-		return 1;
-	}
-	return 0;
-}
-
-int is_collision_1(struct Circle circle, struct Rect rect) {
+int is_collision(struct Circle circle, struct Rect rect) {
 	if (circle.x + circle.radius * 2 >= rect.x &&
 		circle.x <= rect.x + rect.width &&
 		circle.y + circle.radius * 2 >= rect.y &&
@@ -177,8 +169,16 @@ int main(void)
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   ILI9341_Init();
   ILI9341_Fill_Screen(WHITE);
+  GYRO_DrvTypeDef gyro;
+  uint16_t init;
+  float data_gyros[3];
+  uint8_t id;
+
+  I3G4250D_Init(init);
+  id = I3G4250D_ReadID();
 
   srand(time(NULL));
 
@@ -187,37 +187,27 @@ int main(void)
   char str[5];
   int points = 0;
 
-//  struct Rect player = {0, 0, 30, 30, GREEN};
   struct Rect filler = {0, 0, 20, 20, WHITE};
-  struct Circle player1 = {0, 0, 15, CYAN};
+  struct Circle player = {0, 0, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
-  while (1)
-  {
+  while (1) {
+
+	  I3G4250D_ReadXYZAngRate(data_gyros);
+	  I3G4250D_GetDataStatus();
+
 	  int rand_x = rand() % 210;
 	  int rand_y = rand() % 280;
 
 	  if (exists == 0) {
-		  field.border.x = rand_x;
-		  field.border.y = rand_y;
-		  field.fill.x = rand_x + 3;
-		  field.fill.y = rand_y + 3;
+		  change_position(&field, rand_x, rand_y);
 		  draw_field(field);
 		  exists = 1;
 	  }
 
-//	  draw_rect(player);
-	  draw_circle(player1);
+	  draw_circle(player);
 
-//	  collision = is_collision(player, field.border);
-	  collision = is_collision_1(player1, field.border);
-
-//	  if (collision == 1) {
-//		  field.border.color = WHITE;
-//		  draw_field(field);
-//		  field.border.color = RED;
-//		  exists = 0;
-//	  }
+	  collision = is_collision(player, field.border);
 
 	  if (collision == 1) {
 		  field.border.color = WHITE;
@@ -228,25 +218,21 @@ int main(void)
 	  }
 
 	  HAL_Delay(10);
-	  player1.color = WHITE;
-//	  draw_rect(player);
-	  draw_circle(player1);
-	  player1.color = GREEN;
+	  player.color = WHITE;
+	  draw_circle(player);
+	  player.color = GREEN;
 
-	  player1.x++;
-	  player1.y++;
-	  if (player1.x + player1.radius * 2 >= 320 || player1.y + player1.radius * 2 >= 240) {
-		  player1.x = 0;
-		  player1.y = 0;
+	  player.x++;
+	  player.y++;
+	  if (player.x + player.radius * 2 >= 320 || player.y + player.radius * 2 >= 240) {
+		  player.x = 0;
+		  player.y = 0;
 		  exists = 0;
 	  }
-//	  ILI9341_Draw_Horizontal_Line(3, 3, 10, NAVY);
-//	  ILI9341_Draw_Vertical_Line(2, 4, 20, NAVY);
-//	  ILI9341_Draw_Vertical_Line(13, 4, 20, NAVY);
-//	  ILI9341_Draw_Horizontal_Line(3, 24, 10, NAVY);
-	  itoa(points, str, 10);
 
 	  draw_rect(filler);
+
+	  itoa(points, str, 10);
 	  LCD_Font(3, 20, str, _Open_Sans_Bold_16, 1, 0x0000);
     /* USER CODE END WHILE */
 

@@ -18,6 +18,8 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "l3gd20.h"
+#include "main.h"
+#include "spi.h"
 
 /** @addtogroup BSP
   * @{
@@ -90,6 +92,25 @@ GYRO_DrvTypeDef L3gd20Drv =
 /** @defgroup L3GD20_Private_Functions
   * @{
   */
+
+void    GYRO_IO_Init(void){
+
+}
+
+void GYRO_IO_Write(uint8_t *pBuffer, uint8_t WriteAddr, uint16_t NumByteToWrite){
+	HAL_GPIO_WritePin(NCS_MEMS_SPI_GPIO_Port, NCS_MEMS_SPI_Pin, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi5, WriteAddr, 1, HAL_MAX_DELAY);
+	HAL_SPI_Transmit(&hspi5, pBuffer, NumByteToWrite, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin(NCS_MEMS_SPI_GPIO_Port, NCS_MEMS_SPI_Pin, GPIO_PIN_SET);
+}
+
+void GYRO_IO_Read(uint8_t *pBuffer, uint8_t ReadAddr, uint16_t NumByteToRead){
+	ReadAddr |= 0x80;
+	HAL_GPIO_WritePin(NCS_MEMS_SPI_GPIO_Port, NCS_MEMS_SPI_Pin, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi5, &ReadAddr, 1, HAL_MAX_DELAY);
+	HAL_SPI_Receive(&hspi5, pBuffer, NumByteToRead, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin(NCS_MEMS_SPI_GPIO_Port, NCS_MEMS_SPI_Pin, GPIO_PIN_SET);
+}
 
 /**
   * @brief  Set L3GD20 Initialization.

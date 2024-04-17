@@ -16,5 +16,6 @@ struct Field {
 };
 
 void draw_field(struct Field field);
+void change_position(struct Field *field, int rand_x, int rand_y);
 
 #endif /* INC_FIELD_H_ */
