@@ -36,11 +36,12 @@
 #include "ILI9341_STM32_Driver.h"
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "rect.h"
 #include "field.h"
 #include "circle.h"
 #include "l3gd20.h"
-#include "i3g4250d.h"
+#include "I3G42500_VER2.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -159,6 +160,12 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  I3G4250D_t dev;
+  vang_t angles;
+
+  GYRO_init(&dev);
+  GYRO_ang(&dev,&angles);
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -172,29 +179,21 @@ int main(void)
 
   ILI9341_Init();
   ILI9341_Fill_Screen(WHITE);
-  GYRO_DrvTypeDef gyro;
-  uint16_t init;
-  float data_gyros[3];
-  uint8_t id;
-
-  I3G4250D_Init(init);
-  id = I3G4250D_ReadID();
 
   srand(time(NULL));
 
   uint8_t exists = 0;
   int collision = 0;
   char str[5];
+  char buffer_f[10];
   int points = 0;
 
-  struct Rect filler = {0, 0, 20, 20, WHITE};
+  struct Rect filler = {0, 0, 100, 100, WHITE};
   struct Circle player = {0, 0, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
   while (1) {
-
-	  I3G4250D_ReadXYZAngRate(data_gyros);
-	  I3G4250D_GetDataStatus();
+	  GYRO_ang(&dev,&angles);
 
 	  int rand_x = rand() % 210;
 	  int rand_y = rand() % 280;
@@ -227,13 +226,19 @@ int main(void)
 	  if (player.x + player.radius * 2 >= 320 || player.y + player.radius * 2 >= 240) {
 		  player.x = 0;
 		  player.y = 0;
-		  exists = 0;
+//		  exists = 0;
 	  }
 
 	  draw_rect(filler);
 
 	  itoa(points, str, 10);
 	  LCD_Font(3, 20, str, _Open_Sans_Bold_16, 1, 0x0000);
+	  sprintf(buffer_f, "%.2f", angles.x);
+	  LCD_Font(3, 40, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
+	  sprintf(buffer_f, "%.2f", angles.y);
+	  LCD_Font(3, 60, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
+	  sprintf(buffer_f, "%.2f", angles.z);
+	  LCD_Font(3, 80, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
