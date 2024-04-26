@@ -37,6 +37,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "rect.h"
 #include "field.h"
 #include "circle.h"
@@ -188,14 +189,26 @@ int main(void)
   char buffer_f[10];
   int points = 0;
 
-  struct Rect filler = {0, 0, 100, 100, WHITE};
+  struct Rect filler = {0, 0, 30, 30, WHITE};
   struct Circle player = {0, 0, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
   int k = 0;
   int x_speed = 1, y_speed = 1;
+
+  double angle_s_deg = 0.0;
+  double angle_s_rad = 0.0;
+  double sin_val = 0.0, cos_val = 0.0;
+  int x_est_value = 0, y_est_value = 0;
+
   while (1) {
 	  GYRO_ang(&dev,&angles);
+
+	  angle_s_rad = angle_s_deg * M_PI / 180.0;
+	  sin_val = sin(angle_s_rad);
+	  cos_val = cos(angle_s_rad);
+	  x_est_value = (int)round(sin_val * 5);
+	  y_est_value = (int)round(cos_val * 5);
 
 	  int rand_x = rand() % 210;
 	  int rand_y = rand() % 280;
@@ -225,13 +238,13 @@ int main(void)
 	  draw_circle(player);
 	  player.color = GREEN;
 
-	  if (player.x + x_speed > 210) player.x = 210;
-	  else if (player.x + x_speed < 0) player.x = 0;
-	  else player.x += x_speed;
+	  if (player.x + x_speed + x_est_value > 210) player.x = 210;
+	  else if (player.x + x_speed + x_est_value < 0) player.x = 0;
+	  else player.x += x_speed + x_est_value;
 
-	  if (player.y + y_speed > 290) player.y = 290;
-	  else if (player.y + y_speed < 0) player.y = 0;
-	  else player.y += y_speed;
+	  if (player.y + y_speed + y_est_value > 290) player.y = 290;
+	  else if (player.y + y_speed + y_est_value < 0) player.y = 0;
+	  else player.y += y_speed + y_est_value;
 
 	  if (player.x + player.radius * 2 >= 240 || player.x <= 0) {
 		  if (abs(x_speed) > 1) x_speed += (x_speed > 1) ? -1 : 1;
@@ -245,10 +258,10 @@ int main(void)
 	  draw_rect(filler);
 	  itoa(points, str, 10);
 	  LCD_Font(3, 20, str, _Open_Sans_Bold_16, 1, 0x0000);
-	  itoa(x_speed, str, 10);
-	  LCD_Font(3, 40, str, _Open_Sans_Bold_16, 1, 0x0000);
-	  itoa(y_speed, str, 10);
-	  LCD_Font(3, 60, str, _Open_Sans_Bold_16, 1, 0x0000);
+//	  itoa(x_speed, str, 10);
+//	  LCD_Font(3, 40, str, _Open_Sans_Bold_16, 1, 0x0000);
+//	  itoa(y_speed, str, 10);
+//	  LCD_Font(3, 60, str, _Open_Sans_Bold_16, 1, 0x0000);
 
 	  if (k == 20) {
 
@@ -260,6 +273,9 @@ int main(void)
 //		  LCD_Font(3, 80, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
 		  k = 0;
 	  }
+
+	  angle_s_deg += 5;
+	  if (angle_s_deg == 360) angle_s_deg = 0;
 	  k++;
 	  /* USER CODE END WHILE */
 
