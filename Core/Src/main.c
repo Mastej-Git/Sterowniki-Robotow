@@ -192,6 +192,8 @@ int main(void)
   struct Circle player = {0, 0, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
+  int k = 0;
+  int x_speed = 1, y_speed = 1;
   while (1) {
 	  GYRO_ang(&dev,&angles);
 
@@ -214,6 +216,8 @@ int main(void)
 		  field.border.color = RED;
 		  exists = 0;
 		  points++;
+		  x_speed += (x_speed > 0) ? 1 : -1;
+		  y_speed += (y_speed > 0) ? 1 : -1;
 	  }
 
 	  HAL_Delay(10);
@@ -221,25 +225,43 @@ int main(void)
 	  draw_circle(player);
 	  player.color = GREEN;
 
-	  player.x++;
-	  player.y++;
-	  if (player.x + player.radius * 2 >= 320 || player.y + player.radius * 2 >= 240) {
-		  player.x = 0;
-		  player.y = 0;
-//		  exists = 0;
+	  if (player.x + x_speed > 210) player.x = 210;
+	  else if (player.x + x_speed < 0) player.x = 0;
+	  else player.x += x_speed;
+
+	  if (player.y + y_speed > 290) player.y = 290;
+	  else if (player.y + y_speed < 0) player.y = 0;
+	  else player.y += y_speed;
+
+	  if (player.x + player.radius * 2 >= 240 || player.x <= 0) {
+		  if (abs(x_speed) > 1) x_speed += (x_speed > 1) ? -1 : 1;
+		  x_speed = x_speed * -1;
+	  }
+	  if (player.y + player.radius * 2 >= 320 || player.y <= 0) {
+		  y_speed = y_speed * -1;
+		  if (abs(y_speed) > 1) y_speed += (y_speed > 1) ? -1 : 1;
 	  }
 
 	  draw_rect(filler);
-
 	  itoa(points, str, 10);
 	  LCD_Font(3, 20, str, _Open_Sans_Bold_16, 1, 0x0000);
-	  sprintf(buffer_f, "%.2f", angles.x);
-	  LCD_Font(3, 40, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
-	  sprintf(buffer_f, "%.2f", angles.y);
-	  LCD_Font(3, 60, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
-	  sprintf(buffer_f, "%.2f", angles.z);
-	  LCD_Font(3, 80, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
-    /* USER CODE END WHILE */
+	  itoa(x_speed, str, 10);
+	  LCD_Font(3, 40, str, _Open_Sans_Bold_16, 1, 0x0000);
+	  itoa(y_speed, str, 10);
+	  LCD_Font(3, 60, str, _Open_Sans_Bold_16, 1, 0x0000);
+
+	  if (k == 20) {
+
+//		  sprintf(buffer_f, "%.2f", angles.x);
+//		  LCD_Font(3, 40, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
+//		  sprintf(buffer_f, "%.2f", angles.y);
+//		  LCD_Font(3, 60, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
+//		  sprintf(buffer_f, "%.2f", angles.z);
+//		  LCD_Font(3, 80, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
+		  k = 0;
+	  }
+	  k++;
+	  /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
