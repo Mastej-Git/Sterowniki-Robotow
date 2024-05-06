@@ -43,7 +43,6 @@
 #include "circle.h"
 #include "l3gd20.h"
 #include "I3G42500_VER2.h"
-//#include "mpu6050.h"
 #include "MPU6050_2.h"
 /* USER CODE END Includes */
 
@@ -103,9 +102,6 @@
 
 /* USER CODE BEGIN PV */
 MPU6050_t MPU6050;
-volatile uint8_t Angles_flag = 0;
-uint8_t itcounter;
-volatile uint8_t B1_flag= 1;
 
 char uart_buffer[64];
 float Pitch_A;
@@ -172,12 +168,6 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  I3G4250D_t dev;
-  vang_t angles;
-
-  GYRO_init(&dev);
-  GYRO_ang(&dev,&angles);
-
   while (MPU6050_Init(&hi2c3) == 1);
 
   /* USER CODE END 2 */
@@ -202,7 +192,7 @@ int main(void)
   char buffer_f[10];
   int points = 0;
 
-  struct Rect filler = {0, 0, 100, 100, WHITE};
+  struct Rect filler = {0, 0, 60, 60, WHITE};
   struct Circle player = {0, 0, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
@@ -219,7 +209,6 @@ int main(void)
   int x_est_value = 0, y_est_value = 0;
 
   while (1) {
-	  GYRO_ang(&dev,&angles);
 //	  MPU6050_Read_All(&hi2c3, &MPU6050);
 //
 //	  kalman_angle->angle = Kalman_getAngle(kalman_angle, MPU6050.Gx, MPU6050.Ax, (float)(HAL_GetTick() - time)/1000);
@@ -248,7 +237,7 @@ int main(void)
 //	  y_est_value = (int)round(cos_val * 5);
 
 	  x_est_value = -(int)round(Roll_A/15);
-	  y_est_value = -(int)round(Pitch_A/15);
+	  y_est_value = -(int)round(Pitch_A/7.5);
 
 	  int rand_x = rand() % 210;
 	  int rand_y = rand() % 280;
@@ -305,8 +294,6 @@ int main(void)
 		  LCD_Font(3, 40, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
 		  sprintf(buffer_f, "%.2f", Pitch_A);
 		  LCD_Font(3, 60, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
-//		  sprintf(buffer_f, "%.2f", MPU6050.Gz);
-//		  LCD_Font(3, 80, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
 		  k = 0;
 	  }
 
