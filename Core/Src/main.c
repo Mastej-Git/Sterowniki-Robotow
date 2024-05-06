@@ -43,6 +43,8 @@
 #include "circle.h"
 #include "l3gd20.h"
 #include "I3G42500_VER2.h"
+//#include "mpu6050.h"
+#include "MPU6050_2.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -100,7 +102,16 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+MPU6050_t MPU6050;
+volatile uint8_t Angles_flag = 0;
+uint8_t itcounter;
+volatile uint8_t B1_flag= 1;
 
+char uart_buffer[64];
+float Pitch_A;
+float Roll_A;
+float Pitch_G;
+float Roll_G;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -167,6 +178,8 @@ int main(void)
   GYRO_init(&dev);
   GYRO_ang(&dev,&angles);
 
+  while (MPU6050_Init(&hi2c3) == 1);
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -189,12 +202,16 @@ int main(void)
   char buffer_f[10];
   int points = 0;
 
-  struct Rect filler = {0, 0, 30, 30, WHITE};
+  struct Rect filler = {0, 0, 100, 100, WHITE};
   struct Circle player = {0, 0, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
   int k = 0;
   int x_speed = 1, y_speed = 1;
+
+//  Kalman_t *kalman_angle;
+//  double angle_x, angle_y;
+//  uint32_t time = HAL_GetTick();
 
   double angle_s_deg = 0.0;
   double angle_s_rad = 0.0;
@@ -203,12 +220,35 @@ int main(void)
 
   while (1) {
 	  GYRO_ang(&dev,&angles);
+//	  MPU6050_Read_All(&hi2c3, &MPU6050);
+//
+//	  kalman_angle->angle = Kalman_getAngle(kalman_angle, MPU6050.Gx, MPU6050.Ax, (float)(HAL_GetTick() - time)/1000);
+//	  time = HAL_GetTick();
+//	  angle_x = kalman_angle->angle;
+
+	  MPU6050_Read_MPU(&hi2c3, &MPU6050);
+	  Calculate_Accel_Values(&MPU6050);
+	  Calculate_Gyro_Values(&MPU6050);
+	  Get_Accel_Angles(&MPU6050);
+	  Get_Gyro_Angles(&MPU6050, 0.01);
+	  Comp_Filter_Results(&MPU6050);
+	  //R_Accel_Pitch(&Pitch_A, &MPU6050);
+	  Pitch_A = MPU6050.Accel_Pitch;
+	  //R_Accel_Roll(&Roll_A, &MPU6050);
+	  Roll_A = MPU6050.Accel_Roll;
+	  //R_Gyro_Pitch(&Pitch_G, &MPU6050);
+	  Pitch_G = MPU6050.Gyro_Pitch;
+	  //R_Gyro_Roll(&Roll_G, &MPU6050);
+	  Roll_G = MPU6050.Gyro_Roll;
 
 	  angle_s_rad = angle_s_deg * M_PI / 180.0;
 	  sin_val = sin(angle_s_rad);
 	  cos_val = cos(angle_s_rad);
-	  x_est_value = (int)round(sin_val * 5);
-	  y_est_value = (int)round(cos_val * 5);
+//	  x_est_value = (int)round(sin_val * 5);
+//	  y_est_value = (int)round(cos_val * 5);
+
+	  x_est_value = -(int)round(Roll_A/15);
+	  y_est_value = -(int)round(Pitch_A/15);
 
 	  int rand_x = rand() % 210;
 	  int rand_y = rand() % 280;
@@ -255,21 +295,17 @@ int main(void)
 		  if (abs(y_speed) > 1) y_speed += (y_speed > 1) ? -1 : 1;
 	  }
 
-	  draw_rect(filler);
+
 	  itoa(points, str, 10);
 	  LCD_Font(3, 20, str, _Open_Sans_Bold_16, 1, 0x0000);
-//	  itoa(x_speed, str, 10);
-//	  LCD_Font(3, 40, str, _Open_Sans_Bold_16, 1, 0x0000);
-//	  itoa(y_speed, str, 10);
-//	  LCD_Font(3, 60, str, _Open_Sans_Bold_16, 1, 0x0000);
 
 	  if (k == 20) {
-
-//		  sprintf(buffer_f, "%.2f", angles.x);
-//		  LCD_Font(3, 40, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
-//		  sprintf(buffer_f, "%.2f", angles.y);
-//		  LCD_Font(3, 60, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
-//		  sprintf(buffer_f, "%.2f", angles.z);
+		  draw_rect(filler);
+		  sprintf(buffer_f, "%.2f", Roll_A);
+		  LCD_Font(3, 40, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
+		  sprintf(buffer_f, "%.2f", Pitch_A);
+		  LCD_Font(3, 60, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
+//		  sprintf(buffer_f, "%.2f", MPU6050.Gz);
 //		  LCD_Font(3, 80, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
 		  k = 0;
 	  }
