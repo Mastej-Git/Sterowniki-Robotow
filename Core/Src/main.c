@@ -216,11 +216,11 @@ int main(void)
 //	  angle_x = kalman_angle->angle;
 
 	  MPU6050_Read_MPU(&hi2c3, &MPU6050);
-	  Calculate_Accel_Values(&MPU6050);
-	  Calculate_Gyro_Values(&MPU6050);
-	  Get_Accel_Angles(&MPU6050);
-	  Get_Gyro_Angles(&MPU6050, 0.01);
-	  Comp_Filter_Results(&MPU6050);
+	  MPU6050_Convert_Acc_Values(&MPU6050);
+	  MPU6050_Convert_Gyro_Values(&MPU6050);
+	  MPU6050_Get_Acc_Angles(&MPU6050);
+	  MPU6050_Get_Gyro_Angles(&MPU6050, 0.01);
+	  MPU6050_Comp_Filter(&MPU6050);
 	  //R_Accel_Pitch(&Pitch_A, &MPU6050);
 	  Pitch_A = MPU6050.Accel_Pitch;
 	  //R_Accel_Roll(&Roll_A, &MPU6050);

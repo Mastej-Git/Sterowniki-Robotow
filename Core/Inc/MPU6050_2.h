@@ -13,14 +13,13 @@
 #define AFS_SEL_3 2048
 
 
-
 #define ACCEL_LPF_ALPHA 0.100000000f
 #define GYRO_LPF_ALPHA 0.950000000f
 #define COMPLEMENTARY_ALPHA 0.09090909f
 
 
-typedef struct
-{
+typedef struct {
+
 	int16_t Gyro_X_RAW;
     int16_t Gyro_Y_RAW;
     int16_t Gyro_Z_RAW;
@@ -31,7 +30,6 @@ typedef struct
 
     float Gyro_Pitch;
     float Gyro_Roll;
-
 
 
 	int16_t Accel_X_RAW;
@@ -45,25 +43,21 @@ typedef struct
     float Accel_Pitch;
     float Accel_Roll;
 
-
-
 } MPU6050_t;
-// Sensor board initialization
+
+
 uint8_t MPU6050_Init(I2C_HandleTypeDef *I2Cx);
-
-// Reading raw sensor values
-void Calculate_Accel_Values(MPU6050_t *Raw_Values);
-
-void Calculate_Gyro_Values(MPU6050_t *Raw_Values);
 
 void MPU6050_Read_MPU(I2C_HandleTypeDef *I2Cx, MPU6050_t *DataStruct);
 
-// Calculating the spatial position of the sensor 
-void Get_Accel_Angles(MPU6050_t *Raw_Values);
+void MPU6050_Convert_Acc_Values(MPU6050_t *Raw_Values);
 
-void Get_Gyro_Angles(MPU6050_t *Raw_Values, double Sample_Time);
+void MPU6050_Convert_Gyro_Values(MPU6050_t *Raw_Values);
 
-// Complementary filter implementation for accelerometer and gyroscope fussion
-void Comp_Filter_Results(MPU6050_t *Results);
+void MPU6050_Get_Acc_Angles(MPU6050_t *Raw_Values);
+
+void MPU6050_Get_Gyro_Angles(MPU6050_t *Raw_Values, double Sample_Time);
+
+void MPU6050_Comp_Filter(MPU6050_t *Results);
 
 
