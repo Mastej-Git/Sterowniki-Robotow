@@ -9,6 +9,7 @@
 #define SRC_CIRCLE_H_
 
 #include "ILI9341_STM32_Driver.h"
+#include "rect.h"
 
 struct Circle {
 	int x;
@@ -18,5 +19,6 @@ struct Circle {
 };
 
 void draw_circle(struct Circle circle);
+int is_collision(struct Circle circle, struct Rect rect);
 
 #endif /* SRC_CIRCLE_H_ */

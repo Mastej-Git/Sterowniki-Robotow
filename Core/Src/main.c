@@ -33,17 +33,19 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ILI9341_STM32_Driver.h"
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+
+//#include "l3gd20.h"
+//#include "I3G42500_VER2.h"
+#include "ILI9341_STM32_Driver.h"
+#include "MPU6050_2.h"
+
 #include "rect.h"
 #include "field.h"
 #include "circle.h"
-#include "l3gd20.h"
-#include "I3G42500_VER2.h"
-#include "MPU6050_2.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -119,15 +121,6 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int is_collision(struct Circle circle, struct Rect rect) {
-	if (circle.x + circle.radius * 2 >= rect.x &&
-		circle.x <= rect.x + rect.width &&
-		circle.y + circle.radius * 2 >= rect.y &&
-		circle.y <= rect.y + rect.height) {
-		return 1;
-	}
-	return 0;
-}
 /* USER CODE END 0 */
 
 /**
@@ -199,40 +192,32 @@ int main(void)
   int k = 0;
   int x_speed = 1, y_speed = 1;
 
-//  Kalman_t *kalman_angle;
-//  double angle_x, angle_y;
-//  uint32_t time = HAL_GetTick();
-
   double angle_s_deg = 0.0;
-  double angle_s_rad = 0.0;
-  double sin_val = 0.0, cos_val = 0.0;
+//  double angle_s_rad = 0.0;
+//  double sin_val = 0.0, cos_val = 0.0;
   int x_est_value = 0, y_est_value = 0;
 
   while (1) {
-//	  MPU6050_Read_All(&hi2c3, &MPU6050);
-//
-//	  kalman_angle->angle = Kalman_getAngle(kalman_angle, MPU6050.Gx, MPU6050.Ax, (float)(HAL_GetTick() - time)/1000);
-//	  time = HAL_GetTick();
-//	  angle_x = kalman_angle->angle;
 
 	  MPU6050_Read_MPU(&hi2c3, &MPU6050);
+
 	  MPU6050_Convert_Acc_Values(&MPU6050);
 	  MPU6050_Convert_Gyro_Values(&MPU6050);
+
 	  MPU6050_Get_Acc_Angles(&MPU6050);
 	  MPU6050_Get_Gyro_Angles(&MPU6050, 0.01);
+
 	  MPU6050_Comp_Filter(&MPU6050);
-	  //R_Accel_Pitch(&Pitch_A, &MPU6050);
+
 	  Pitch_A = MPU6050.Accel_Pitch;
-	  //R_Accel_Roll(&Roll_A, &MPU6050);
 	  Roll_A = MPU6050.Accel_Roll;
-	  //R_Gyro_Pitch(&Pitch_G, &MPU6050);
+
 	  Pitch_G = MPU6050.Gyro_Pitch;
-	  //R_Gyro_Roll(&Roll_G, &MPU6050);
 	  Roll_G = MPU6050.Gyro_Roll;
 
-	  angle_s_rad = angle_s_deg * M_PI / 180.0;
-	  sin_val = sin(angle_s_rad);
-	  cos_val = cos(angle_s_rad);
+//	  angle_s_rad = angle_s_deg * M_PI / 180.0;
+//	  sin_val = sin(angle_s_rad);
+//	  cos_val = cos(angle_s_rad);
 //	  x_est_value = (int)round(sin_val * 5);
 //	  y_est_value = (int)round(cos_val * 5);
 

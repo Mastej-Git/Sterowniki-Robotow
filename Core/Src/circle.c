@@ -47,3 +47,13 @@ void draw_circle(struct Circle circle) {
 	ILI9341_Draw_Horizontal_Line(circle.x + 8, circle.y + 28, 14, circle.color);
 	ILI9341_Draw_Horizontal_Line(circle.x + 11, circle.y + 29, 8, circle.color);
 }
+
+int is_collision(struct Circle circle, struct Rect rect) {
+	if (circle.x + circle.radius * 2 >= rect.x &&
+		circle.x <= rect.x + rect.width &&
+		circle.y + circle.radius * 2 >= rect.y &&
+		circle.y <= rect.y + rect.height) {
+		return 1;
+	}
+	return 0;
+}
