@@ -20,44 +20,44 @@
 
 typedef struct {
 
-	int16_t Gyro_X_RAW;
-    int16_t Gyro_Y_RAW;
-    int16_t Gyro_Z_RAW;
+	int16_t gyro_x_raw;
+    int16_t gyro_y_raw;
+    int16_t gyro_z_raw;
 
-    float Gyro_X;
-    float Gyro_Y;
-    float Gyro_Z;
+    float gyro_X;
+    float gyro_Y;
+    float gyro_Z;
 
-    float Gyro_Pitch;
-    float Gyro_Roll;
+    float gyro_pitch;
+    float gyro_roll;
 
 
-	int16_t Accel_X_RAW;
-    int16_t Accel_Y_RAW;
-    int16_t Accel_Z_RAW;
+	int16_t accel_x_raw;
+    int16_t accel_y_raw;
+    int16_t accel_z_raw;
 
-    float Accel_X;
-    float Accel_Y;
-    float Accel_Z;
+    float accel_X;
+    float accel_Y;
+    float accel_Z;
 
-    float Accel_Pitch;
-    float Accel_Roll;
+    float accel_pitch;
+    float accel_roll;
 
 } MPU6050_t;
 
 
 uint8_t MPU6050_Init(I2C_HandleTypeDef *I2Cx);
 
-void MPU6050_Read_MPU(I2C_HandleTypeDef *I2Cx, MPU6050_t *DataStruct);
+void MPU6050_Read_MPU(I2C_HandleTypeDef *I2Cx, MPU6050_t *data_struct);
 
-void MPU6050_Convert_Acc_Values(MPU6050_t *Raw_Values);
+void MPU6050_Convert_Acc_Values(MPU6050_t *raw_values);
 
-void MPU6050_Convert_Gyro_Values(MPU6050_t *Raw_Values);
+void MPU6050_Convert_Gyro_Values(MPU6050_t *raw_values);
 
-void MPU6050_Get_Acc_Angles(MPU6050_t *Raw_Values);
+void MPU6050_Get_Acc_Angles(MPU6050_t *raw_values);
 
-void MPU6050_Get_Gyro_Angles(MPU6050_t *Raw_Values, double Sample_Time);
+void MPU6050_Get_Gyro_Angles(MPU6050_t *raw_values, double sample_time);
 
-void MPU6050_Comp_Filter(MPU6050_t *Results);
+void MPU6050_Comp_Filter(MPU6050_t *results);
 
 

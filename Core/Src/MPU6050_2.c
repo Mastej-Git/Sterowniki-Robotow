@@ -26,62 +26,62 @@ uint8_t MPU6050_Init(I2C_HandleTypeDef *I2Cx) {
     return 1;
 }
 
-void MPU6050_Read_MPU(I2C_HandleTypeDef *I2Cx, MPU6050_t *DataStruct) {
+void MPU6050_Read_MPU(I2C_HandleTypeDef *I2Cx, MPU6050_t *data_struct) {
     uint8_t Rec_Data[6];
 
     HAL_I2C_Mem_Read(I2Cx, MPU6050_ADDR, GYRO_XOUT_H_R_GYRO_XOUT, 1, Rec_Data, 6, i2c_timeout);
 
-    DataStruct->Gyro_X_RAW = (int16_t)(Rec_Data[0] << 8 | Rec_Data[1]);
-    DataStruct->Gyro_Y_RAW = (int16_t)(Rec_Data[2] << 8 | Rec_Data[3]);
-    DataStruct->Gyro_Z_RAW = (int16_t)(Rec_Data[4] << 8 | Rec_Data[5]);
+    data_struct->gyro_x_raw = (int16_t)(Rec_Data[0] << 8 | Rec_Data[1]);
+    data_struct->gyro_y_raw = (int16_t)(Rec_Data[2] << 8 | Rec_Data[3]);
+    data_struct->gyro_z_raw = (int16_t)(Rec_Data[4] << 8 | Rec_Data[5]);
 
     HAL_I2C_Mem_Read(I2Cx, MPU6050_ADDR, ACCEL_XOUT_H_R_ACCEL_XOUT, 1, Rec_Data, 6, i2c_timeout);
 
-    DataStruct->Accel_X_RAW = (int16_t)(Rec_Data[0] << 8 | Rec_Data[1]);
-    DataStruct->Accel_Y_RAW = (int16_t)(Rec_Data[2] << 8 | Rec_Data[3]);
-    DataStruct->Accel_Z_RAW = (int16_t)(Rec_Data[4] << 8 | Rec_Data[5]);
+    data_struct->accel_x_raw = (int16_t)(Rec_Data[0] << 8 | Rec_Data[1]);
+    data_struct->accel_y_raw = (int16_t)(Rec_Data[2] << 8 | Rec_Data[3]);
+    data_struct->accel_z_raw = (int16_t)(Rec_Data[4] << 8 | Rec_Data[5]);
 }
 
-void MPU6050_Convert_Acc_Values(MPU6050_t *Raw_Values) {
-	Raw_Values-> Accel_X = Raw_Values-> Accel_X_RAW*((2*G)/32768);
-	Raw_Values-> Accel_Y = Raw_Values-> Accel_Y_RAW*((2*G)/32768);
-	Raw_Values-> Accel_Z = Raw_Values-> Accel_Z_RAW*((2*G)/32768);
+void MPU6050_Convert_Acc_Values(MPU6050_t *raw_values) {
+	raw_values->accel_X = raw_values->accel_x_raw*((2*G)/32768);
+	raw_values->accel_Y = raw_values->accel_y_raw*((2*G)/32768);
+	raw_values->accel_Z = raw_values->accel_z_raw*((2*G)/32768);
 };
 
-void MPU6050_Convert_Gyro_Values(MPU6050_t *Raw_Values) {
-	Raw_Values-> Gyro_X = Raw_Values-> Gyro_X_RAW/131.0;
-	Raw_Values-> Gyro_Y = Raw_Values-> Gyro_Y_RAW/131.0;
-	Raw_Values-> Gyro_Z = Raw_Values-> Gyro_Z_RAW/131.0;
+void MPU6050_Convert_Gyro_Values(MPU6050_t *raw_values) {
+	raw_values->gyro_X = raw_values->gyro_x_raw/131.0;
+	raw_values->gyro_Y = raw_values->gyro_y_raw/131.0;
+	raw_values->gyro_Z = raw_values->gyro_z_raw/131.0;
 };
 
-void MPU6050_Get_Acc_Angles(MPU6050_t *Raw_Values) {
-	float pitch_tmp =  RAD_TO_DEG * asin(Raw_Values->Accel_X / G);
-	Raw_Values->Accel_Pitch = Raw_Values->Accel_Pitch * (1 - ACCEL_LPF_ALPHA) + pitch_tmp * ACCEL_LPF_ALPHA;
+void MPU6050_Get_Acc_Angles(MPU6050_t *raw_values) {
+	float pitch_tmp =  RAD_TO_DEG * asin(raw_values->accel_X / G);
+	raw_values->accel_pitch = raw_values->accel_pitch * (1 - ACCEL_LPF_ALPHA) + pitch_tmp * ACCEL_LPF_ALPHA;
 
-    if (Raw_Values->Accel_Z != 0) {
-    	float roll_tmp = RAD_TO_DEG * atan(Raw_Values->Accel_Y / Raw_Values->Accel_Z);
-    	Raw_Values->Accel_Roll = Raw_Values->Accel_Roll * (1 - ACCEL_LPF_ALPHA) + roll_tmp * ACCEL_LPF_ALPHA;
+    if (raw_values->accel_Z != 0) {
+    	float roll_tmp = RAD_TO_DEG * atan(raw_values->accel_Y / raw_values->accel_Z);
+    	raw_values->accel_roll = raw_values->accel_roll * (1 - ACCEL_LPF_ALPHA) + roll_tmp * ACCEL_LPF_ALPHA;
     } else {
-    	Raw_Values->Accel_Roll = 0.0;
+    	raw_values->accel_roll = 0.0;
     }
 }
 
 
 
-void MPU6050_Get_Gyro_Angles(MPU6050_t *Raw_Values, double Sample_Time) {
-	float pitch_tmp = Raw_Values->Gyro_Pitch + Raw_Values->Gyro_Y*Sample_Time;
-	Raw_Values->Gyro_Pitch = Raw_Values->Gyro_Pitch * (1 - GYRO_LPF_ALPHA) + pitch_tmp * GYRO_LPF_ALPHA;
+void MPU6050_Get_Gyro_Angles(MPU6050_t *raw_values, double sample_time) {
+	float pitch_tmp = raw_values->gyro_pitch + raw_values->gyro_Y * sample_time;
+	raw_values->gyro_pitch = raw_values->gyro_pitch * (1 - GYRO_LPF_ALPHA) + pitch_tmp * GYRO_LPF_ALPHA;
 
-	float roll_tmp = Raw_Values->Gyro_Roll + Raw_Values->Gyro_X*Sample_Time;
-	Raw_Values->Gyro_Roll = Raw_Values->Gyro_Roll * (1 - GYRO_LPF_ALPHA) + roll_tmp * GYRO_LPF_ALPHA;
-};
+	float roll_tmp = raw_values->gyro_roll + raw_values->gyro_X * sample_time;
+	raw_values->gyro_roll = raw_values->gyro_roll * (1 - GYRO_LPF_ALPHA) + roll_tmp * GYRO_LPF_ALPHA;
+}
 
-void MPU6050_Comp_Filter(MPU6050_t *Results) {
-	float pitch_tmp = Results->Gyro_Pitch * COMPLEMENTARY_ALPHA + (1-COMPLEMENTARY_ALPHA) * Results->Accel_Pitch;
-	Results->Accel_Pitch = pitch_tmp;
-	Results->Gyro_Pitch = pitch_tmp;
+void MPU6050_Comp_Filter(MPU6050_t *results) {
+	float pitch_tmp = results->gyro_pitch * COMPLEMENTARY_ALPHA + (1-COMPLEMENTARY_ALPHA) * results->accel_pitch;
+	results->accel_pitch = pitch_tmp;
+	results->gyro_pitch = pitch_tmp;
 
-	float roll_tmp = Results->Gyro_Roll * COMPLEMENTARY_ALPHA + (1-COMPLEMENTARY_ALPHA) * Results->Accel_Roll;
-	Results->Accel_Roll = roll_tmp;
-	Results->Gyro_Roll = roll_tmp;
+	float roll_tmp = results->gyro_roll * COMPLEMENTARY_ALPHA + (1-COMPLEMENTARY_ALPHA) * results->accel_roll;
+	results->accel_roll = roll_tmp;
+	results->gyro_roll = roll_tmp;
 }

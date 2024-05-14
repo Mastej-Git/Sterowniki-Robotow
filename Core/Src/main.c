@@ -108,8 +108,6 @@ MPU6050_t MPU6050;
 char uart_buffer[64];
 float Pitch_A;
 float Roll_A;
-float Pitch_G;
-float Roll_G;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -190,7 +188,7 @@ int main(void)
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
   int k = 0;
-  int x_speed = 1, y_speed = 1;
+  int x_speed = 0, y_speed = 0;
 
   double angle_s_deg = 0.0;
 //  double angle_s_rad = 0.0;
@@ -209,11 +207,8 @@ int main(void)
 
 	  MPU6050_Comp_Filter(&MPU6050);
 
-	  Pitch_A = MPU6050.Accel_Pitch;
-	  Roll_A = MPU6050.Accel_Roll;
-
-	  Pitch_G = MPU6050.Gyro_Pitch;
-	  Roll_G = MPU6050.Gyro_Roll;
+	  Pitch_A = MPU6050.accel_pitch;
+	  Roll_A = MPU6050.accel_roll;
 
 //	  angle_s_rad = angle_s_deg * M_PI / 180.0;
 //	  sin_val = sin(angle_s_rad);
@@ -221,8 +216,8 @@ int main(void)
 //	  x_est_value = (int)round(sin_val * 5);
 //	  y_est_value = (int)round(cos_val * 5);
 
-	  x_est_value = -(int)round(Roll_A/15);
-	  y_est_value = -(int)round(Pitch_A/7.5);
+	  x_est_value = -(int)round(Roll_A/7.5);
+	  y_est_value = -(int)round(Pitch_A/3.25);
 
 	  int rand_x = rand() % 210;
 	  int rand_y = rand() % 280;
@@ -243,8 +238,12 @@ int main(void)
 		  field.border.color = RED;
 		  exists = 0;
 		  points++;
-		  x_speed += (x_speed > 0) ? 1 : -1;
-		  y_speed += (y_speed > 0) ? 1 : -1;
+
+//		  if (x_speed > y_speed) x_speed += (x_speed > 0) ? 1 : -1;
+//		  else y_speed += (y_speed > 0) ? 1 : -1;
+
+//		  x_speed += (x_est_value > 0) ? 1 : -1;
+//		  y_speed += (y_est_value > 0) ? 1 : -1;
 	  }
 
 	  HAL_Delay(10);
@@ -261,12 +260,12 @@ int main(void)
 	  else player.y += y_speed + y_est_value;
 
 	  if (player.x + player.radius * 2 >= 240 || player.x <= 0) {
-		  if (abs(x_speed) > 1) x_speed += (x_speed > 1) ? -1 : 1;
+//		  if (abs(x_speed) > 1) x_speed += (x_est_value > 1) ? -1 : 1;
 		  x_speed = x_speed * -1;
 	  }
 	  if (player.y + player.radius * 2 >= 320 || player.y <= 0) {
 		  y_speed = y_speed * -1;
-		  if (abs(y_speed) > 1) y_speed += (y_speed > 1) ? -1 : 1;
+//		  if (abs(y_speed) > 1) y_speed += (y_est_value > 1) ? -1 : 1;
 	  }
 
 
