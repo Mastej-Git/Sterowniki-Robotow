@@ -180,22 +180,21 @@ int main(void)
   uint8_t exists = 0;
   int collision = 0;
   char str[5];
-  char buffer_f[10];
   int points = 0;
 
-  struct Rect filler = {0, 0, 60, 60, WHITE};
-  struct Circle player = {0, 0, 15, CYAN};
+  struct Rect filler = {0, 0, 30, 30, WHITE};
+  struct Circle player = {105, 145, 15, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
-  int k = 0;
-  int x_speed = 0, y_speed = 0;
+//  int x_speed = 0, y_speed = 0;
 
-  double angle_s_deg = 0.0;
-//  double angle_s_rad = 0.0;
-//  double sin_val = 0.0, cos_val = 0.0;
   int x_est_value = 0, y_est_value = 0;
 
   while (1) {
+
+	  itoa(points, str, 10);
+	  draw_rect(filler);
+	  LCD_Font(3, 20, str, _Open_Sans_Bold_16, 1, 0x0000);
 
 	  MPU6050_Read_MPU(&hi2c3, &MPU6050);
 
@@ -209,12 +208,6 @@ int main(void)
 
 	  Pitch_A = MPU6050.accel_pitch;
 	  Roll_A = MPU6050.accel_roll;
-
-//	  angle_s_rad = angle_s_deg * M_PI / 180.0;
-//	  sin_val = sin(angle_s_rad);
-//	  cos_val = cos(angle_s_rad);
-//	  x_est_value = (int)round(sin_val * 5);
-//	  y_est_value = (int)round(cos_val * 5);
 
 	  x_est_value = -(int)round(Roll_A/7.5);
 	  y_est_value = -(int)round(Pitch_A/3.25);
@@ -238,12 +231,6 @@ int main(void)
 		  field.border.color = RED;
 		  exists = 0;
 		  points++;
-
-//		  if (x_speed > y_speed) x_speed += (x_speed > 0) ? 1 : -1;
-//		  else y_speed += (y_speed > 0) ? 1 : -1;
-
-//		  x_speed += (x_est_value > 0) ? 1 : -1;
-//		  y_speed += (y_est_value > 0) ? 1 : -1;
 	  }
 
 	  HAL_Delay(10);
@@ -251,39 +238,23 @@ int main(void)
 	  draw_circle(player);
 	  player.color = GREEN;
 
-	  if (player.x + x_speed + x_est_value > 210) player.x = 210;
-	  else if (player.x + x_speed + x_est_value < 0) player.x = 0;
-	  else player.x += x_speed + x_est_value;
-
-	  if (player.y + y_speed + y_est_value > 290) player.y = 290;
-	  else if (player.y + y_speed + y_est_value < 0) player.y = 0;
-	  else player.y += y_speed + y_est_value;
-
 	  if (player.x + player.radius * 2 >= 240 || player.x <= 0) {
-//		  if (abs(x_speed) > 1) x_speed += (x_est_value > 1) ? -1 : 1;
-		  x_speed = x_speed * -1;
+	      player.x = (player.x + player.radius * 2 >= 240) ? 239 - player.radius * 2 : 1;
+	      x_est_value = (int)(x_est_value * -0.7);
 	  }
+
 	  if (player.y + player.radius * 2 >= 320 || player.y <= 0) {
-		  y_speed = y_speed * -1;
-//		  if (abs(y_speed) > 1) y_speed += (y_est_value > 1) ? -1 : 1;
+	      player.y = (player.y + player.radius * 2 >= 320) ? 319 - player.radius * 2 : 1;
+	      y_est_value = (int)(y_est_value * -0.7);
 	  }
 
+	  if (player.x + x_est_value > 210) player.x = 210;
+	  else if (player.x + x_est_value < 0) player.x = 0;
+	  else player.x += x_est_value;
 
-	  itoa(points, str, 10);
-	  LCD_Font(3, 20, str, _Open_Sans_Bold_16, 1, 0x0000);
-
-	  if (k == 20) {
-		  draw_rect(filler);
-		  sprintf(buffer_f, "%.2f", Roll_A);
-		  LCD_Font(3, 40, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
-		  sprintf(buffer_f, "%.2f", Pitch_A);
-		  LCD_Font(3, 60, buffer_f, _Open_Sans_Bold_16, 1, 0x0000);
-		  k = 0;
-	  }
-
-	  angle_s_deg += 5;
-	  if (angle_s_deg == 360) angle_s_deg = 0;
-	  k++;
+	  if (player.y + y_est_value > 290) player.y = 290;
+	  else if (player.y + y_est_value < 0) player.y = 0;
+	  else player.y += y_est_value;
 	  /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
