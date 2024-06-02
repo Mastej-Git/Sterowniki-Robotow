@@ -15,7 +15,7 @@
 
 #define ACCEL_LPF_ALPHA 0.100000000f
 #define GYRO_LPF_ALPHA 0.950000000f
-#define COMPLEMENTARY_ALPHA 0.09090909f
+#define IMPORTANCE 0.09090909f
 
 
 typedef struct {
@@ -45,19 +45,12 @@ typedef struct {
 
 } MPU6050_t;
 
-
 uint8_t MPU6050_Init(I2C_HandleTypeDef *I2Cx);
-
 void MPU6050_Read_MPU(I2C_HandleTypeDef *I2Cx, MPU6050_t *data_struct);
-
 void MPU6050_Convert_Acc_Values(MPU6050_t *raw_values);
-
 void MPU6050_Convert_Gyro_Values(MPU6050_t *raw_values);
-
 void MPU6050_Get_Acc_Angles(MPU6050_t *raw_values);
-
 void MPU6050_Get_Gyro_Angles(MPU6050_t *raw_values, double sample_time);
-
 void MPU6050_Comp_Filter(MPU6050_t *results);
 
 

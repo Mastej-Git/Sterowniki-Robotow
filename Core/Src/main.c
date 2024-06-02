@@ -38,11 +38,8 @@
 #include <stdio.h>
 #include <math.h>
 
-//#include "l3gd20.h"
-//#include "I3G42500_VER2.h"
 #include "ILI9341_STM32_Driver.h"
-#include "MPU6050_2.h"
-
+#include "MPU6050_STM32_Driver.h"
 #include "rect.h"
 #include "field.h"
 #include "circle.h"

@@ -1,4 +1,4 @@
-#include "MPU6050_2.h"
+#include "MPU6050_STM32_Driver.h"
 
 const uint16_t i2c_timeout = 100;
 
@@ -77,11 +77,11 @@ void MPU6050_Get_Gyro_Angles(MPU6050_t *raw_values, double sample_time) {
 }
 
 void MPU6050_Comp_Filter(MPU6050_t *results) {
-	float pitch_tmp = results->gyro_pitch * COMPLEMENTARY_ALPHA + (1-COMPLEMENTARY_ALPHA) * results->accel_pitch;
+	float pitch_tmp = results->gyro_pitch * IMPORTANCE + results->accel_pitch * (1-IMPORTANCE);
 	results->accel_pitch = pitch_tmp;
 	results->gyro_pitch = pitch_tmp;
 
-	float roll_tmp = results->gyro_roll * COMPLEMENTARY_ALPHA + (1-COMPLEMENTARY_ALPHA) * results->accel_roll;
+	float roll_tmp = results->gyro_roll * IMPORTANCE + results->accel_roll * (1-IMPORTANCE);
 	results->accel_roll = roll_tmp;
 	results->gyro_roll = roll_tmp;
 }
