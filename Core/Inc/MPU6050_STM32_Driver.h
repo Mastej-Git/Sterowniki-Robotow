@@ -12,10 +12,7 @@
 #define AFS_SEL_2 4096
 #define AFS_SEL_3 2048
 
-
-#define ACCEL_LPF_ALPHA 0.100000000f
-#define GYRO_LPF_ALPHA 0.950000000f
-#define IMPORTANCE 0.09090909f
+#define ALPHA 0.05f
 
 
 typedef struct {

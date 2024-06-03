@@ -105,6 +105,15 @@ MPU6050_t MPU6050;
 char uart_buffer[64];
 float Pitch_A;
 float Roll_A;
+
+#define DEG_TO_RAD (3.1415f/180.f)
+#define GRAVITY 9.81f
+#define	M_TO_PIX 6576.6f
+#define COEFFICIENT 0.8f
+#define BALL_RADIUS 15
+#define WIDTH 240
+#define HEIGHT 320
+#define AIR_DRAG 5.f
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -180,14 +189,19 @@ int main(void)
   int points = 0;
 
   struct Rect filler = {0, 0, 30, 30, WHITE};
-  struct Circle player = {105, 145, 15, CYAN};
+  struct Circle player = {105, 145, BALL_RADIUS, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
 //  int x_speed = 0, y_speed = 0;
 
-  int x_est_value = 0, y_est_value = 0;
+  float x_est_value = WIDTH/2, y_est_value = HEIGHT/2;
+  float v_x = 0, v_y = 0;
 
+  uint32_t start = HAL_GetTick();
   while (1) {
+
+	  uint32_t t = HAL_GetTick();
+	  float DT = (t - start)* 0.001f;
 
 	  itoa(points, str, 10);
 	  draw_rect(filler);
@@ -199,15 +213,25 @@ int main(void)
 	  MPU6050_Convert_Gyro_Values(&MPU6050);
 
 	  MPU6050_Get_Acc_Angles(&MPU6050);
-	  MPU6050_Get_Gyro_Angles(&MPU6050, 0.01);
+	  MPU6050_Get_Gyro_Angles(&MPU6050, DT);
 
 	  MPU6050_Comp_Filter(&MPU6050);
 
-	  Pitch_A = MPU6050.accel_pitch;
-	  Roll_A = MPU6050.accel_roll;
+	  Pitch_A = MPU6050.accel_pitch * DEG_TO_RAD;
+	  Roll_A = MPU6050.accel_roll * DEG_TO_RAD;
 
-	  x_est_value = -(int)round(Roll_A/7.5);
-	  y_est_value = -(int)round(Pitch_A/3.25);
+	  float a_x = GRAVITY * sinf(Roll_A);
+	  float a_y = GRAVITY * sinf(Pitch_A);
+
+	  float v_x_new = v_x + DT * (a_x - AIR_DRAG * v_x);
+	  float v_y_new = v_y + DT * (a_y - AIR_DRAG * v_y);
+	  x_est_value = x_est_value + (DT * v_x + DT * DT * 0.5f * a_x) * M_TO_PIX;
+	  y_est_value = y_est_value + (DT * v_y + DT * DT * 0.5f * a_y) * M_TO_PIX;
+//	  x_est_value = -(int)round(Roll_A/7.5);
+//	  y_est_value = -(int)round(Pitch_A/3.25);
+	  v_x = v_x_new;
+	  v_y = v_y_new;
+	  start = t;
 
 	  int rand_x = rand() % 210;
 	  int rand_y = rand() % 280;
@@ -235,23 +259,38 @@ int main(void)
 	  draw_circle(player);
 	  player.color = GREEN;
 
-	  if (player.x + player.radius * 2 >= 240 || player.x <= 0) {
-	      player.x = (player.x + player.radius * 2 >= 240) ? 239 - player.radius * 2 : 1;
-	      x_est_value = (int)(x_est_value * -0.7);
+//	  if (player.x + player.radius * 2 >= 240 || player.x <= 0) {
+//	      player.x = (player.x + player.radius * 2 >= 240) ? 239 - player.radius * 2 : 1;
+//	      v_x = v_x * -COEFFICIENT;
+//	  }
+//
+//	  if (player.y + player.radius * 2 >= 320 || player.y <= 0) {
+//	      player.y = (player.y + player.radius * 2 >= 320) ? 319 - player.radius * 2 : 1;
+//	      v_y = v_y * -COEFFICIENT;
+//	  }
+
+	  if ((x_est_value + 2 *BALL_RADIUS) > WIDTH) {
+		  x_est_value = WIDTH - 2 *BALL_RADIUS - 1;
+		  v_x = v_x * -COEFFICIENT;
 	  }
 
-	  if (player.y + player.radius * 2 >= 320 || player.y <= 0) {
-	      player.y = (player.y + player.radius * 2 >= 320) ? 319 - player.radius * 2 : 1;
-	      y_est_value = (int)(y_est_value * -0.7);
+	  if (x_est_value < 0) {
+		  x_est_value = 1;
+		  v_x = v_x * -COEFFICIENT;
 	  }
 
-	  if (player.x + x_est_value > 210) player.x = 210;
-	  else if (player.x + x_est_value < 0) player.x = 0;
-	  else player.x += x_est_value;
+	  if ((y_est_value + 2 *BALL_RADIUS) > HEIGHT) {
+		  y_est_value = HEIGHT - 2 *BALL_RADIUS - 1;
+		  v_y = v_y * -COEFFICIENT;
+	  }
 
-	  if (player.y + y_est_value > 290) player.y = 290;
-	  else if (player.y + y_est_value < 0) player.y = 0;
-	  else player.y += y_est_value;
+	  if (y_est_value < 0) {
+		  y_est_value = 1;
+		  v_y = v_y * -COEFFICIENT;
+	  }
+
+	  player.x = x_est_value;
+	  player.y = y_est_value;
 	  /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

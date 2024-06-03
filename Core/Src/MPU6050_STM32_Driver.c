@@ -55,33 +55,24 @@ void MPU6050_Convert_Gyro_Values(MPU6050_t *raw_values) {
 };
 
 void MPU6050_Get_Acc_Angles(MPU6050_t *raw_values) {
-	float pitch_tmp =  RAD_TO_DEG * asin(raw_values->accel_X / G);
-	raw_values->accel_pitch = raw_values->accel_pitch * (1 - ACCEL_LPF_ALPHA) + pitch_tmp * ACCEL_LPF_ALPHA;
-
-    if (raw_values->accel_Z != 0) {
-    	float roll_tmp = RAD_TO_DEG * atan(raw_values->accel_Y / raw_values->accel_Z);
-    	raw_values->accel_roll = raw_values->accel_roll * (1 - ACCEL_LPF_ALPHA) + roll_tmp * ACCEL_LPF_ALPHA;
-    } else {
-    	raw_values->accel_roll = 0.0;
-    }
+	if ((raw_values->accel_X < G) && (raw_values->accel_X > -G)) {
+		raw_values->accel_pitch = - RAD_TO_DEG * asin(raw_values->accel_X / G);
+	}
+	raw_values->accel_roll = - RAD_TO_DEG * atan2(raw_values->accel_Y, raw_values->accel_Z);
 }
-
 
 
 void MPU6050_Get_Gyro_Angles(MPU6050_t *raw_values, double sample_time) {
-	float pitch_tmp = raw_values->gyro_pitch + raw_values->gyro_Y * sample_time;
-	raw_values->gyro_pitch = raw_values->gyro_pitch * (1 - GYRO_LPF_ALPHA) + pitch_tmp * GYRO_LPF_ALPHA;
-
-	float roll_tmp = raw_values->gyro_roll + raw_values->gyro_X * sample_time;
-	raw_values->gyro_roll = raw_values->gyro_roll * (1 - GYRO_LPF_ALPHA) + roll_tmp * GYRO_LPF_ALPHA;
+	raw_values->gyro_pitch = raw_values->gyro_pitch + raw_values->gyro_Y * sample_time;
+	raw_values->gyro_roll = raw_values->gyro_roll - raw_values->gyro_X * sample_time;
 }
 
 void MPU6050_Comp_Filter(MPU6050_t *results) {
-	float pitch_tmp = results->gyro_pitch * IMPORTANCE + results->accel_pitch * (1-IMPORTANCE);
+	float pitch_tmp = results->gyro_pitch * (1-ALPHA) + results->accel_pitch * ALPHA;
 	results->accel_pitch = pitch_tmp;
 	results->gyro_pitch = pitch_tmp;
 
-	float roll_tmp = results->gyro_roll * IMPORTANCE + results->accel_roll * (1-IMPORTANCE);
+	float roll_tmp = results->gyro_roll * (1-ALPHA) + results->accel_roll * ALPHA;
 	results->accel_roll = roll_tmp;
 	results->gyro_roll = roll_tmp;
 }
