@@ -109,11 +109,11 @@ float Roll_A;
 #define DEG_TO_RAD (3.1415f/180.f)
 #define GRAVITY 9.81f
 #define	M_TO_PIX 6576.6f
-#define COEFFICIENT 0.8f
+#define COEFFICIENT 0.5f
 #define BALL_RADIUS 15
 #define WIDTH 240
 #define HEIGHT 320
-#define AIR_DRAG 5.f
+#define AIR_DRAG 3.f
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
