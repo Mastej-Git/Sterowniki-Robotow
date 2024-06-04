@@ -192,8 +192,6 @@ int main(void)
   struct Circle player = {105, 145, BALL_RADIUS, CYAN};
   struct Field field = {{0, 0, 30, 30, RED}, {0, 0, 24, 24, WHITE}};
 
-//  int x_speed = 0, y_speed = 0;
-
   float x_est_value = WIDTH/2, y_est_value = HEIGHT/2;
   float v_x = 0, v_y = 0;
 
@@ -227,8 +225,6 @@ int main(void)
 	  float v_y_new = v_y + DT * (a_y - AIR_DRAG * v_y);
 	  x_est_value = x_est_value + (DT * v_x + DT * DT * 0.5f * a_x) * M_TO_PIX;
 	  y_est_value = y_est_value + (DT * v_y + DT * DT * 0.5f * a_y) * M_TO_PIX;
-//	  x_est_value = -(int)round(Roll_A/7.5);
-//	  y_est_value = -(int)round(Pitch_A/3.25);
 	  v_x = v_x_new;
 	  v_y = v_y_new;
 	  start = t;
@@ -258,16 +254,6 @@ int main(void)
 	  player.color = WHITE;
 	  draw_circle(player);
 	  player.color = GREEN;
-
-//	  if (player.x + player.radius * 2 >= 240 || player.x <= 0) {
-//	      player.x = (player.x + player.radius * 2 >= 240) ? 239 - player.radius * 2 : 1;
-//	      v_x = v_x * -COEFFICIENT;
-//	  }
-//
-//	  if (player.y + player.radius * 2 >= 320 || player.y <= 0) {
-//	      player.y = (player.y + player.radius * 2 >= 320) ? 319 - player.radius * 2 : 1;
-//	      v_y = v_y * -COEFFICIENT;
-//	  }
 
 	  if ((x_est_value + 2 *BALL_RADIUS) > WIDTH) {
 		  x_est_value = WIDTH - 2 *BALL_RADIUS - 1;
