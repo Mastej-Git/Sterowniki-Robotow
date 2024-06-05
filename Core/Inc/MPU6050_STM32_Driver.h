@@ -48,6 +48,6 @@ void MPU6050_Convert_Acc_Values(MPU6050_t *raw_values);
 void MPU6050_Convert_Gyro_Values(MPU6050_t *raw_values);
 void MPU6050_Get_Acc_Angles(MPU6050_t *raw_values);
 void MPU6050_Get_Gyro_Angles(MPU6050_t *raw_values, double sample_time);
-void MPU6050_Comp_Filter(MPU6050_t *results);
+void MPU6050_Comp_Filter(MPU6050_t *uf_data);
 
 

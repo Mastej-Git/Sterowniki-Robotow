@@ -67,12 +67,12 @@ void MPU6050_Get_Gyro_Angles(MPU6050_t *raw_values, double sample_time) {
 	raw_values->gyro_roll = raw_values->gyro_roll - raw_values->gyro_X * sample_time;
 }
 
-void MPU6050_Comp_Filter(MPU6050_t *results) {
-	float pitch_tmp = results->gyro_pitch * (1-ALPHA) + results->accel_pitch * ALPHA;
-	results->accel_pitch = pitch_tmp;
-	results->gyro_pitch = pitch_tmp;
+void MPU6050_Comp_Filter(MPU6050_t *uf_data) {
+	float pitch_tmp = uf_data->gyro_pitch * (1-ALPHA) + uf_data->accel_pitch * ALPHA;
+	uf_data->accel_pitch = pitch_tmp;
+	uf_data->gyro_pitch = pitch_tmp;
 
-	float roll_tmp = results->gyro_roll * (1-ALPHA) + results->accel_roll * ALPHA;
-	results->accel_roll = roll_tmp;
-	results->gyro_roll = roll_tmp;
+	float roll_tmp = uf_data->gyro_roll * (1-ALPHA) + uf_data->accel_roll * ALPHA;
+	uf_data->accel_roll = roll_tmp;
+	uf_data->gyro_roll = roll_tmp;
 }
